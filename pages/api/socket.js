@@ -7,7 +7,8 @@ import { server } from 'Socket.IO'
  */
 
 let globaldata = {
-    running: false,
+    enabled: false,
+    timerOn: false,
     players: {},
     count: 0
 } 
@@ -30,29 +31,46 @@ export default function handler(req, res) {
      */
     function onPositionUpdate(socket, data) {
         // do nothing if not racing
-        if (globaldata.running === false) {
+        if (globaldata.enabled === false) {
             return;
         }
-        
-        for (let i = 0; i < data.length; i++) {
-            let id = globaldata.players[data.color];
-            if (id === undefined) {
-                globaldata.players[data.color] = count++;
+        // start the race automatically if they start running.
+        if (globaldata.timerOn === false) {
+            for (let i = 0; i < data.length; i++) {
+                if (data[i].position > 0) {
+                    socket.emit('race_start');
+                    globaldata.timerOn === true;
+                }
             }
+            /* // we might want this idk yet
+            if (globaldata.timerOn === false)
+                return;
+            */
         }
 
+        // create id for each color
+        for (let i = 0; i < data.length; i++) {
+            let id = globaldata.players[data[i].color];
+            if (id === undefined) {
+                globaldata.players[data[i].color] = count++;
+                id = globaldata.players[data[i].color];
+            }
+        }
+        
         data = data.map((value, index, array) => {
             return {
                 ...value,
-                "id": id,
+                "id": id, // ? shouldn't this be globaldata.players[color] or something
             }
         })
+        // send to scoreboard
+        socket.emit('score_update', data);
 
         let all_finished = true;
         // when player has position 1, tell scoreboard that they finished
         for (let i = 0; i < data.length; i++) {
             if (data[i].position >= 1) {
-                socket.emit('player_finish', data[i].color);
+                socket.emit('player_finish', data[i].id);
             }
             if (data[i].position < 1) {
                 all_finished = false;   
@@ -60,21 +78,31 @@ export default function handler(req, res) {
         }
         // the race is over when all players finished
         if (all_finished === true) {
-            globaldata.running = false;
+            globaldata.enabled = false;
             socket.emit('race_stop');
         }
 
     }
 
     function onStartUpdate(socket) {
-        
+        // this is a manual start. I am thinking we should use automatic start
+        // instead mainly, but we could have a control emit to set to manual mode
+        // if we want to have options.
         socket.emit('race_start');
-        globaldata.running = true;
+        globaldata.enabled = true;
     }
 
     function onStop(socket) {
         socket.emit('race_stop');
-        globaldata.running = false;
+        globaldata.enabled = false;
+    }
+
+    function onreset(socket) {
+        socket.emit('race_reset')
+        globaldata.timerOn = false;
+        globaldata.enabled = true;
+        globaldata.players = {};
+        globaldata.count = 0;
     }
 
     io.on('connection', (socket) => {
