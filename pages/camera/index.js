@@ -10,7 +10,7 @@ const socket = io();
 
 
 
-const WebcamCapture = ({ jerseyCalibrations, sendJerseyPositions, lastUpdatedJerseyIndex, selectedDevice }) => {
+const WebcamCapture = ({ jerseyCalibrations, emitEvent, lastUpdatedJerseyIndex }) => {
   useSocket(socket);
   const webcamRef = useRef(null);
   const previewCanvasRef = useRef(null);
@@ -116,7 +116,7 @@ const WebcamCapture = ({ jerseyCalibrations, sendJerseyPositions, lastUpdatedJer
           {
             name: jersey.name,
             color: jersey.displayColor,
-            position: cx / input_image.cols + 0.1
+            position: Math.max(0, Math.min(1, (cx / input_image.cols - 0.1) / 0.8))
           }
         )
       }
@@ -138,7 +138,7 @@ const WebcamCapture = ({ jerseyCalibrations, sendJerseyPositions, lastUpdatedJer
     hsv.delete();
 
     // Push jersey positions
-    sendJerseyPositions(jersey_positions);
+    emitEvent(jersey_positions);
 
     // Stop processing and allow the next capture
     processingImage.current = false;
@@ -172,7 +172,6 @@ const WebcamCapture = ({ jerseyCalibrations, sendJerseyPositions, lastUpdatedJer
       <canvas ref={previewCanvasRef} width="720" height="480"></canvas>
       <canvas ref={thresholdHelperCanvasRef} width="720" height="480"></canvas>
 
-
       <Webcam
         audio={false}
         height={480}
@@ -180,9 +179,7 @@ const WebcamCapture = ({ jerseyCalibrations, sendJerseyPositions, lastUpdatedJer
         screenshotFormat="image/jpeg"
         width={720}
         videoConstraints={{
-          facingMode: {
-            exact: "environment"
-          }
+
         }}
       />
     </div>
@@ -304,59 +301,9 @@ const JerseyCalibrationWidget = ({
 const CameraPage = () => {
   // Jersey Defaults
   const [devices, setDevices] = useState([]);
-  const [selectedDevice, setSelectedDevice] = useState(null);
 
-  const handleDevices = React.useCallback(
-    mediaDevices => setDevices(mediaDevices.filter(({kind}) => kind === videoInput)),
-    []
-  )
-  useEffect(
-    () => {
-      navigator.mediaDevices.enumerateDevices().then((devices) => {
-        setDevices(devices);
-      });
-    }, [handleDevices]
-  )
-
-  const [jerseyCalibrations, setJerseyCalibrations] = useState([
-    {
-      name: "orange",
-      displayColor: "hsla(0, 50%, 60%, 1)",
-      hsvBounds: {
-        lowerHueBound: 0,
-        upperHueBound: 180,
-        lowerSaturationBound: 0,
-        upperSaturationBound: 255,
-        lowerValueBound: 0,
-        upperValueBound: 255,
-      },
-    },
-    {
-      name: "yellow",
-      displayColor: "hsla(240, 50%, 60%, 1)",
-      hsvBounds: {
-        lowerHueBound: 0,
-        upperHueBound: 180,
-        lowerSaturationBound: 0,
-        upperSaturationBound: 255,
-        lowerValueBound: 0,
-        upperValueBound: 255,
-      },
-    },
-  ]);
+  const [jerseyCalibrations, setJerseyCalibrations] = useState([{"name":"New Yellow","displayColor":"#fefb41","hsvBounds":{"lowerHueBound":29,"upperHueBound":56,"lowerSaturationBound":74,"upperSaturationBound":255,"lowerValueBound":166,"upperValueBound":255}},{"name":"New Orange","displayColor":"#ff6a00","hsvBounds":{"lowerHueBound":0,"upperHueBound":16,"lowerSaturationBound":132,"upperSaturationBound":255,"lowerValueBound":162,"upperValueBound":255}},{"name":"New Red","displayColor":"#e22400","hsvBounds":{"lowerHueBound":164,"upperHueBound":180,"lowerSaturationBound":198,"upperSaturationBound":255,"lowerValueBound":105,"upperValueBound":255}}]);
   const [lastUpdatedJerseyIndex, setLastUpdatedJerseyIndex] = useState(0);
-  const [centerOfMass, setCenterOfMass] = useState({
-    x: 0,
-    y: 0,
-  });
-  useEffect(() => {
-    socket.emit("pos_update", [
-      {
-        color: "o",
-        position: centerOfMass.x,
-      },
-    ]);
-  }, [centerOfMass.x]);
 
   return (
     <>
@@ -424,22 +371,16 @@ const CameraPage = () => {
           ))}
         </div>
       </div>
-      <select onChange={(e) => setSelectedDevice(e.target.value)}>
-      {devices.map((device, index) => (
-        <option key={index} value={device.deviceId}>{device.label}</option>
-      ))}
-      </select>
       <WebcamCapture
         jerseyCalibrations={jerseyCalibrations}
-        sendJerseyPositions={
-          (jersey_positions) => {
+        emitEvent={
+          (jersey_positions, image) => {
             if(jersey_positions.length > 0){
               socket.emit("pos_update", jersey_positions);
             }
           }
         }
         lastUpdatedJerseyIndex={lastUpdatedJerseyIndex}
-        selectedDevice={selectedDevice}
       />
     </>
   );
