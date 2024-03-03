@@ -18,6 +18,7 @@ export default function Scoreboard(props) {
 
     const [raceState, setRaceState] = useState('RUNNING');
     const [progressBars, setProgressBars] = useState([]);
+    const [winner, setWinner] = useState(null);
 
     return (
         <div className={Classes.container}>
@@ -39,9 +40,13 @@ export default function Scoreboard(props) {
                 </div>
                 <div className={Classes.rightColumn}>
                     { raceState === 'WAITING' &&
-                        <div className={Classes.paragraphText}>Hey there, CUHackit! Stick around! We'll be starting again soon!</div>
+                        <div className={Classes.paragraphText}>{"Hey there, CUHackit! Stick around! We'll be starting again soon!"}</div>
                     }
                     { raceState === 'RUNNING' && progressBars }
+
+                    { raceState === 'FINISHED' &&
+                        <div className={Classes.winnerText}>Player {winner} Wins!</div>
+                    }
                     
                 </div>
             </div>
