@@ -10,7 +10,8 @@ let globaldata = {
     enabled: false,
     timerOn: false,
     players: {},
-    count: 0
+    count: 0,
+    winner: null,
 } 
 
 export default function handler(req, res) {
@@ -69,6 +70,9 @@ export default function handler(req, res) {
         for (let i = 0; i < data.length; i++) {
             if (data[i].position >= 1) {
                 socket.emit('player_finish', data[i].id);
+                if (!globaldata.winner) {
+                    globaldata.winner = data[i].id;
+                }
             }
             if (data[i].position < 1) {
                 all_finished = false;   
@@ -77,7 +81,7 @@ export default function handler(req, res) {
         // the race is over when all players finished
         if (all_finished === true) {
             globaldata.enabled = false;
-            socket.emit('race_stop');
+            socket.emit('race_stop', globaldata.winner);
         }
 
     }
@@ -106,7 +110,7 @@ export default function handler(req, res) {
     // if we use this
     function onToggle(socket) {
         globaldata.ManualOnly = !(globaldata.ManualOnly);
-        socket.emit('ManualOnlyToggle', globaldata.ManualOnly)
+        socket.emit('ManualOnlyToggle', globaldata.ManualOnly);
     }
 
 
