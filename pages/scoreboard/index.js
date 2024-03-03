@@ -68,10 +68,11 @@ export default function Scoreboard(props) {
 
     socket.on('player_finish', (color) => {
         if (!winner) {
-            setWinner(players[color].id);
+            setWinner(color);
             setWinnerTime(`${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`);
         }
     });
+    
 
     const progressBars = Object.values(players).map((player) => {
         console.log(player);
@@ -105,7 +106,7 @@ export default function Scoreboard(props) {
                     { raceState === 'RUNNING' && progressBars }
 
                     { raceState === 'FINISHED' &&
-                        <div className={Classes.winnerText}>Player {winner} wins with a time of {winnerTime}!</div>
+                        <div className={Classes.winnerText}>{winner.toUpperCase()} wins with a time of {winnerTime}!</div>
                     }
                 </div>
             </div>
