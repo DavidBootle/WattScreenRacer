@@ -1,4 +1,4 @@
-import { server } from 'Socket.IO'
+import { Server } from "socket.io"
 
 /**
  * @typedef {Object} Data
