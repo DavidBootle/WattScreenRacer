@@ -32,6 +32,7 @@ function onPositionUpdate(emit, data) {
             if (data[i].position > 0) {
                 emit('race_start');
                 globaldata.timerOn = true;
+                break;
             }
         }
         // we might want this idk yet
