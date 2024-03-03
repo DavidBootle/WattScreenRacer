@@ -4,6 +4,8 @@ import { useState } from 'react';
 import io from 'socket.io-client';
 import useSocket from '../../src/useSocket';
 
+import { useStopwatch } from 'react-timer-hook';
+
 function ProgressBar({name, progress, color}) {
     return (
         <div className={Classes.progressBarContainer}>
@@ -20,31 +22,33 @@ const socket = io();
 export default function Scoreboard(props) {
 
     const [raceState, setRaceState] = useState('WAITING');
-    const [progressBars, setProgressBars] = useState([]);
+    const [players, setPlayers] = useState({});
     const [winner, setWinner] = useState(null);
 
     useSocket(socket);
 
-    socket.on('connect', () => {
-        console.log('Sockets connected to server');
-    });
-
-    // print when disconnected
-    socket.on('disconnect', () => {
-        console.log('Disconnected from server');
-    });
-
-    socket.on('connection_verification', () => {
-        console.log('RECIEVED VERIFICATION FROM SERVER');
-    })
-
-    // look for incoming events
+    // manage sockets
     socket.on('score_update', (data) => {
-        console.log(data);
+        window.data = data;
+        let newPlayers = {...players};
+        data.forEach((value) => {
+            if (players[value.id] === undefined) {
+                newPlayers[value.id] = value;
+            }
+            newPlayers[value.id].position = value.position;
+        });
+        setPlayers(newPlayers);
     });
 
     socket.on('race_start', () => {
         setRaceState('RUNNING');
+    });
+
+    const progressBars = Object.values(players).map((player) => {
+        console.log(player);
+        return (
+            <ProgressBar key={player.id} name={`Player ${player.id + 1}`} progress={player.position * 100} color={player.color} />
+        )
     });
 
     return (
