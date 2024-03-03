@@ -8,13 +8,9 @@ import parse from "color-parse";
 
 const socket = io();
 
-const videoConstraints = {
-  width: 720,
-  height: 480,
-  facingMode: "user",
-};
 
-const WebcamCapture = ({ jerseyCalibrations, sendJerseyPositions, lastUpdatedJerseyIndex }) => {
+
+const WebcamCapture = ({ jerseyCalibrations, sendJerseyPositions, lastUpdatedJerseyIndex, selectedDevice }) => {
   useSocket(socket);
   const webcamRef = useRef(null);
   const previewCanvasRef = useRef(null);
@@ -175,13 +171,19 @@ const WebcamCapture = ({ jerseyCalibrations, sendJerseyPositions, lastUpdatedJer
 
       <canvas ref={previewCanvasRef} width="720" height="480"></canvas>
       <canvas ref={thresholdHelperCanvasRef} width="720" height="480"></canvas>
+
+
       <Webcam
         audio={false}
         height={480}
         ref={webcamRef}
         screenshotFormat="image/jpeg"
         width={720}
-        videoConstraints={videoConstraints}
+        videoConstraints={{
+          facingMode: {
+            exact: "environment"
+          }
+        }}
       />
     </div>
     </>
@@ -301,6 +303,21 @@ const JerseyCalibrationWidget = ({
 
 const CameraPage = () => {
   // Jersey Defaults
+  const [devices, setDevices] = useState([]);
+  const [selectedDevice, setSelectedDevice] = useState(null);
+
+  const handleDevices = React.useCallback(
+    mediaDevices => setDevices(mediaDevices.filter(({kind}) => kind === videoInput)),
+    []
+  )
+  useEffect(
+    () => {
+      navigator.mediaDevices.enumerateDevices().then((devices) => {
+        setDevices(devices);
+      });
+    }, [handleDevices]
+  )
+
   const [jerseyCalibrations, setJerseyCalibrations] = useState([
     {
       name: "orange",
@@ -407,6 +424,11 @@ const CameraPage = () => {
           ))}
         </div>
       </div>
+      <select onChange={(e) => setSelectedDevice(e.target.value)}>
+      {devices.map((device, index) => (
+        <option key={index} value={device.deviceId}>{device.label}</option>
+      ))}
+      </select>
       <WebcamCapture
         jerseyCalibrations={jerseyCalibrations}
         sendJerseyPositions={
@@ -417,6 +439,7 @@ const CameraPage = () => {
           }
         }
         lastUpdatedJerseyIndex={lastUpdatedJerseyIndex}
+        selectedDevice={selectedDevice}
       />
     </>
   );
