@@ -34,10 +34,10 @@ function onPositionUpdate(emit, data) {
                 globaldata.timerOn === true;
             }
         }
-        /* // we might want this idk yet
+        // we might want this idk yet
         if (globaldata.timerOn === false)
             return;
-        */
+        
     }
 
     // Javascript wizardry
