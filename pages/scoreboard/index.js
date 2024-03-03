@@ -1,12 +1,12 @@
 import Head from 'next/head';
 import Classes from './scoreboard.module.scss';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import io from 'socket.io-client';
 import useSocket from '../../src/useSocket';
 
 import { useStopwatch } from 'react-timer-hook';
 
-function ProgressBar({name, progress, color}) {
+function ProgressBar({name, progress, color, completed}) {
     return (
         <div className={Classes.progressBarContainer}>
             <div className={Classes.progressBarText}>{name}</div>
@@ -24,33 +24,66 @@ export default function Scoreboard(props) {
     const [raceState, setRaceState] = useState('WAITING');
     const [players, setPlayers] = useState({});
     const [winner, setWinner] = useState(null);
+    const [winnerTime, setWinnerTime] = useState('');
 
     const {
         seconds,
         minutes,
         start,
+        pause,
         reset,
       } = useStopwatch({ autoStart: true });
 
     useSocket(socket);
 
-    // manage sockets
-    socket.on('score_update', (data) => {
-        window.data = data;
-        let newPlayers = {...players};
-        data.forEach((value) => {
-            if (players[value.id] === undefined) {
-                newPlayers[value.id] = value;
-            }
-            newPlayers[value.id].position = value.position;
+    useEffect(() => {
+        // manage sockets
+        socket.on('score_update', (data) => {
+            console.log('SCORE UPDATE');
+            window.data = data;
+            let newPlayers = {...players};
+            data.forEach((value) => {
+                if (players[value.id] === undefined) {
+                    newPlayers[value.id] = value;
+                }
+                newPlayers[value.id].position = value.position;
+            });
+            setPlayers(newPlayers);
         });
-        setPlayers(newPlayers);
-    });
 
-    socket.on('race_start', () => {
-        setRaceState('RUNNING');
-        start();
+        socket.on('race_start', () => {
+            console.log('RACE STARTING');
+            setRaceState('RUNNING');
+            start();
+        });
+
+        socket.on('race_stop', () => {
+            setRaceState('WAITING');
+            pause();
+        })
+
+        socket.on('race_finished', () => {
+            setRaceState('FINISHED');
+            pause();
+        })
+
+        socket.on('race_reset', () => {
+            setRaceState('WAITING');
+            pause();
+            reset();
+            setPlayers({});
+            setWinner(null);
+            setWinnerTime('');
+        });
+
+        socket.on('player_finish', (color) => {
+            if (!winner) {
+                setWinner(color);
+                setWinnerTime(`${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`);
+            }
+        });
     });
+    
 
     const progressBars = Object.values(players).map((player) => {
         console.log(player);
@@ -74,7 +107,7 @@ export default function Scoreboard(props) {
                         <div className={Classes.stateTimer}>{minutes.toString().padStart(2, "0")}:{seconds.toString().padStart(2, "0")}</div>
                     }
                     { raceState === 'FINISHED' &&
-                        <div className={Classes.stateText}>FINISHED</div>
+                        <div className={Classes.stateText}>RACE COMPLETE</div>
                     }
                 </div>
                 <div className={Classes.rightColumn}>
@@ -84,9 +117,8 @@ export default function Scoreboard(props) {
                     { raceState === 'RUNNING' && progressBars }
 
                     { raceState === 'FINISHED' &&
-                        <div className={Classes.winnerText}>Player {winner} Wins!</div>
+                        <div className={Classes.winnerText}>{winner.toUpperCase()} wins with a time of {winnerTime}!</div>
                     }
-                    
                 </div>
             </div>
         </div>

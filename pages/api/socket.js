@@ -9,12 +9,14 @@ import { createRouter } from 'next-connect';
  */
 
 let globaldata = {
-    enabled: false,
+    enabled: true,
     timerOn: false,
     players: {},
     count: 0,
     winner: null,
 }
+
+
 
 /**
  * Called when the position update is reported from the camera.
@@ -31,13 +33,15 @@ function onPositionUpdate(emit, data) {
         for (let i = 0; i < data.length; i++) {
             if (data[i].position > 0) {
                 emit('race_start');
-                globaldata.timerOn === true;
+                globaldata.timerOn = true;
+                break;
             }
         }
+    
         // we might want this idk yet
         if (globaldata.timerOn === false)
             return;
-        
+           
     }
 
     // Javascript wizardry
@@ -60,9 +64,9 @@ function onPositionUpdate(emit, data) {
     // when player has position 1, tell scoreboard that they finished
     for (let i = 0; i < data.length; i++) {
         if (data[i].position >= 1) {
-            emit('player_finish', data[i].id);
+            emit('player_finish', data[i].color);
             if (!globaldata.winner) {
-                globaldata.winner = data[i].id;
+                globaldata.winner = data[i].color;
             }
         }
         if (data[i].position < 1) {
@@ -72,7 +76,7 @@ function onPositionUpdate(emit, data) {
     // the race is over when all players finished
     if (all_finished === true) {
         globaldata.enabled = false;
-        emit('race_stop', globaldata.winner);
+        emit('race_finished', globaldata.winner);
     }
 
 }

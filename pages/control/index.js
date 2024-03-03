@@ -4,7 +4,42 @@ import useSocket from '../../src/useSocket'
 import { useState } from "react";
 
 const socket = io();
+let thedata = [{
+    position: 0.5,
+    color: 'red',
+},{
+    position: 0.1,
+    color: 'yellow',
+}]
+let thedata2 = [{
+    position: 0.7,
+    color: 'red',
+},{
+    position: 0.4,
+    color: 'green',
+}]
 
+let thedata3 = [{
+    position: 1,
+    color: 'red',
+},{
+    position: 0.6,
+    color: 'yellow',
+},{
+    position: 0.8,
+    color: 'green',
+}]
+
+let thedata4 = [{
+    position: 1,
+    color: 'red',
+},{
+    position: 1,
+    color: 'yellow',
+},{
+    position: 1,
+    color: 'green',
+}]
 
 export default function control() {
     useSocket(socket);
@@ -37,6 +72,26 @@ export default function control() {
                     socket.emit('togglemanual')
                     setManualOnly(!ManualOnly)
                 }}>Toggle Mode</button>
+            </div>
+            <div className={styles.container}>
+                <button className={styles.button} onClick={() => {
+                    socket.emit('pos_update', thedata)
+                }}>Datatest1</button>
+            </div>
+            <div className={styles.container}>
+                <button className={styles.button} onClick={() => {
+                    socket.emit('pos_update', thedata2)
+                }}>Datatest2</button>
+            </div>
+            <div className={styles.container}>
+                <button className={styles.button} onClick={() => {
+                    socket.emit('pos_update', thedata3)
+                }}>Datatest3</button>
+            </div>
+            <div className={styles.container}>
+                <button className={styles.button} onClick={() => {
+                    socket.emit('pos_update', thedata4)
+                }}>Datatest4</button>
             </div>
         </>
     )
