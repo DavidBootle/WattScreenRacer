@@ -62,8 +62,9 @@ export default function Scoreboard(props) {
             pause();
         })
 
-        socket.on('race_finished', () => {
+        socket.on('race_finished', (id) => {
             setRaceState('FINISHED');
+            setWinner(id);
             pause();
         })
 
@@ -76,9 +77,9 @@ export default function Scoreboard(props) {
             setWinnerTime('');
         });
 
-        socket.on('player_finish', (color) => {
+        socket.on('player_finish', (id) => {
             if (!winner) {
-                setWinner(players[color]?.name);
+                setWinner(id);
                 setWinnerTime(`${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`);
             }
         });
@@ -117,7 +118,7 @@ export default function Scoreboard(props) {
                     { raceState === 'RUNNING' && progressBars }
 
                     { raceState === 'FINISHED' &&
-                        <div className={Classes.winnerText}>{winner.toUpperCase()} wins with a time of {winnerTime}!</div>
+                        <div className={Classes.winnerText}>{players[winner]?.name?.toUpperCase()} wins with a time of {winnerTime}!</div>
                     }
                 </div>
             </div>
