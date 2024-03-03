@@ -21,9 +21,9 @@ export default function Scoreboard(props) {
     const [winner, setWinner] = useState(null);
 
     useEffect(() => {
-        async function doShit() { 
+
+        fetch('/api/socket').then(() => {
             // implement socket
-            await fetch('/api/socket');
             const socket = io();
 
             // print when connected
@@ -35,9 +35,7 @@ export default function Scoreboard(props) {
             socket.on('disconnect', () => {
                 console.log('Disconnected from server');
             });
-        }
-
-        doShit();
+        });
     }, []);
 
     return (
