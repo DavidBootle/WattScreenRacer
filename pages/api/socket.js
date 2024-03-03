@@ -31,7 +31,7 @@ function onPositionUpdate(emit, data) {
         for (let i = 0; i < data.length; i++) {
             if (data[i].position > 0) {
                 emit('race_start');
-                globaldata.timerOn === true;
+                globaldata.timerOn = true;
             }
         }
         // we might want this idk yet
