@@ -7,14 +7,6 @@ export default function SocketTest() {
 
     useSocket(socket);
 
-    socket.on('connect', () => {
-        console.log('CONNECTED TO SERVER');
-    })
-
-    socket.on('disconnect', () => {
-        console.log('DISCONNECTED FROM SERVER');
-    })
-
     return (
         <div>
             <h1>Socket Test</h1>
