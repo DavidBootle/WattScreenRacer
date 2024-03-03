@@ -39,6 +39,7 @@
         padding: 40px;
 
         height: 100%;
+        gap: 40px;
 
         .leftColumn {
             display: flex;
@@ -46,7 +47,7 @@
             justify-content: flex-start;
             align-items: flex-start;
 
-            width: 40%;
+            flex-basis: 30%;
 
             .stateText {
                 font-size: 5rem;
@@ -63,7 +64,7 @@
             justify-content: flex-start;
             align-items: flex-start;
 
-            width: 60%;
+            flex-basis: 70%;
             height: 100%;
 
             .paragraphText {
@@ -78,13 +79,18 @@
                 
                 display: flex;
                 flex-direction: row;
-                justify-content: flex-start;
+                justify-content: center;
                 align-items: center;
+
+                gap: 24px;
                 
                 .progressBarText {
                     font-size: 2rem;
                     font-weight: bold;
-                    flex-basis: 70px;
+                    flex-basis: 160px;
+                    display: inline-flex;
+                    justify-content: flex-end;
+                    align-items: center;
                 }
 
                 .progressBar {

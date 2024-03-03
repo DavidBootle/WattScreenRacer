@@ -5,6 +5,14 @@ export default function useSocket(socket) {
         fetch('/api/socket');
         socket.connect();
 
+        socket.on('connect', () => {
+            console.log('Websockets are connected to server.');
+        })
+
+        socket.on('disconnect', () => {
+            console.log('Websockets have been disconnected from the server.');
+        })
+
         return () => {
             socket.disconnect();
         };
