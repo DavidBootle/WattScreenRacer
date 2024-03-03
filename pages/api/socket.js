@@ -9,7 +9,7 @@ import { createRouter } from 'next-connect';
  */
 
 let globaldata = {
-    enabled: false,
+    enabled: true,
     timerOn: false,
     players: {},
     count: 0,
