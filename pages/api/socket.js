@@ -76,7 +76,7 @@ function onPositionUpdate(emit, data) {
     // the race is over when all players finished
     if (all_finished === true) {
         globaldata.enabled = false;
-        emit('race_stop', globaldata.winner);
+        emit('race_finished', globaldata.winner);
     }
 
 }
