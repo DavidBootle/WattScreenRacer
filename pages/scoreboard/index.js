@@ -25,6 +25,13 @@ export default function Scoreboard(props) {
     const [players, setPlayers] = useState({});
     const [winner, setWinner] = useState(null);
 
+    const {
+        seconds,
+        minutes,
+        start,
+        reset,
+      } = useStopwatch({ autoStart: true });
+
     useSocket(socket);
 
     // manage sockets
@@ -42,6 +49,7 @@ export default function Scoreboard(props) {
 
     socket.on('race_start', () => {
         setRaceState('RUNNING');
+        start();
     });
 
     const progressBars = Object.values(players).map((player) => {
@@ -63,7 +71,7 @@ export default function Scoreboard(props) {
                         <div className={Classes.stateText}>WAITING TO START</div>
                     }
                     { raceState === 'RUNNING' &&
-                        <div className={Classes.stateTimer}>0:13</div>
+                        <div className={Classes.stateTimer}>{minutes.toString().padStart(2, "0")}:{seconds.toString().padStart(2, "0")}</div>
                     }
                     { raceState === 'FINISHED' &&
                         <div className={Classes.stateText}>FINISHED</div>
