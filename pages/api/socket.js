@@ -90,9 +90,8 @@ function onPositionUpdate(emit, data, image) {
         //     all_finished = false;
         // }
     }
-
-    for (const [, value] of Object.entries(globaldata.players)) {
-        if (value.finishStatus === undefined) {
+    for (let i = 0; i < globaldata.players.length; i++) {
+        if (globaldata.players[data[i].color].finishStatus === undefined) {
             all_finished = false;
         }
     }
