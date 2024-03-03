@@ -26,7 +26,7 @@ const max_change = .2;
  * @param {Socket} socket The websocket object from socket.io
  * @param {Data[]} data Incoming data from camera
  */
-function onPositionUpdate(emit, data) {
+function onPositionUpdate(emit, data, image) {
     // do nothing if not racing
     if (globaldata.enabled === false) {
         return;
