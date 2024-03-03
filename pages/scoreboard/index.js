@@ -37,6 +37,7 @@ export default function Scoreboard(props) {
 
     // manage sockets
     socket.on('score_update', (data) => {
+        console.log('SCORE UPDATE');
         window.data = data;
         let newPlayers = {...players};
         data.forEach((value) => {
@@ -49,6 +50,7 @@ export default function Scoreboard(props) {
     });
 
     socket.on('race_start', () => {
+        console.log('RACE STARTING');
         setRaceState('RUNNING');
         start();
     });
