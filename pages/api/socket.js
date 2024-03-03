@@ -101,7 +101,6 @@ function onreset(emit) {
 // if we use this
 function onToggle(emit) {
     globaldata.ManualOnly = !(globaldata.ManualOnly);
-    emit('ManualOnlyToggle', globaldata.ManualOnly);
 }
 
 const router = createRouter();
