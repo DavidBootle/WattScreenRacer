@@ -24,6 +24,7 @@ export default function Scoreboard(props) {
     const [raceState, setRaceState] = useState('WAITING');
     const [players, setPlayers] = useState({});
     const [winner, setWinner] = useState(null);
+    const [winnerTime, setWinnerTime] = useState('');
 
     const {
         seconds,
@@ -57,7 +58,20 @@ export default function Scoreboard(props) {
 
     socket.on('race_stop', () => {
         setRaceState('FINISHED');
+        pause();
     })
+
+    socket.on('race_reset', () => {
+        setRaceState('WAITING');
+        reset();
+    });
+
+    socket.on('player_finish', (color) => {
+        if (!winner) {
+            setWinner(players[color].id);
+            setWinnerTime(`${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`);
+        }
+    });
 
     const progressBars = Object.values(players).map((player) => {
         console.log(player);
@@ -81,7 +95,7 @@ export default function Scoreboard(props) {
                         <div className={Classes.stateTimer}>{minutes.toString().padStart(2, "0")}:{seconds.toString().padStart(2, "0")}</div>
                     }
                     { raceState === 'FINISHED' &&
-                        <div className={Classes.stateText}>FINISHED</div>
+                        <div className={Classes.stateText}>RACE COMPLETE</div>
                     }
                 </div>
                 <div className={Classes.rightColumn}>
@@ -91,9 +105,8 @@ export default function Scoreboard(props) {
                     { raceState === 'RUNNING' && progressBars }
 
                     { raceState === 'FINISHED' &&
-                        <div className={Classes.winnerText}>Player {winner} Wins!</div>
+                        <div className={Classes.winnerText}>Player {winner} wins with a time of {winnerTime}!</div>
                     }
-                    
                 </div>
             </div>
         </div>
