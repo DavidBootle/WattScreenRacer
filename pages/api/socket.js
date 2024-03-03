@@ -48,19 +48,17 @@ export default function handler(req, res) {
             */
         }
 
-        // create id for each color
-        for (let i = 0; i < data.length; i++) {
-            let id = globaldata.players[data[i].color];
-            if (id === undefined) {
-                globaldata.players[data[i].color] = count++;
-                id = globaldata.players[data[i].color];
-            }
-        }
-        
+        // Javascript wizardry
         data = data.map((value, index, array) => {
+            let id = globaldata.players[value.color];
+            if (id === undefined) {
+                globaldata.players[value.color] = (globaldata.count)++;
+                id = globaldata.players[value.color];
+            }
+            
             return {
                 ...value,
-                "id": id, // ? shouldn't this be globaldata.players[color] or something
+                "id": id,
             }
         })
         // send to scoreboard
@@ -105,11 +103,19 @@ export default function handler(req, res) {
         globaldata.count = 0;
     }
 
+    // if we use this
+    function onToggle(socket) {
+        globaldata.ManualOnly = !(globaldata.ManualOnly);
+        socket.emit('ManualOnlyToggle', globaldata.ManualOnly)
+    }
+
+
     io.on('connection', (socket) => {
         socket.on('pos_update', (data) => onPositionUpdate(socket, data));
         socket.on('start', () => onStartUpdate(socket));
         socket.on('stop', () => onStop(socket));
         socket.on('reset', () => onreset(socket));
+        socket.on('togglemanual', () => onToggle(socket))
     })
 }
 
