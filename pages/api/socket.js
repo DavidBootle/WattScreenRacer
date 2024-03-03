@@ -70,7 +70,7 @@ function onPositionUpdate(emit, data) {
     }*/
     // send to scoreboard
     emit('score_update', data);
-    previousdata = data;
+    //previousdata = data;
     let all_finished = true;
     // when player has position 1, tell scoreboard that they finished
     for (let i = 0; i < data.length; i++) {
