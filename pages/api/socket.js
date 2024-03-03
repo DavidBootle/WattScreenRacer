@@ -16,7 +16,6 @@ let globaldata = {
     winner: -1,
     ManualOnly: false,
     previousdata: null,
-    image: null,
 }
 
 const max_change = .2;
@@ -70,7 +69,7 @@ function onPositionUpdate(emit, data) {
         }
     }*/
     // send to scoreboard
-    emit('score_update', data, image);
+    emit('score_update', data);
     //previousdata = data;
     let all_finished = true;
     // when player has position 1, tell scoreboard that they finished
@@ -79,7 +78,6 @@ function onPositionUpdate(emit, data) {
             emit('player_finish', data[i].id);
             if (globaldata.winner === -1) {
                 globaldata.winner = data[i].id;
-                globaldata.image = image
             }
         }
         if (data[i].position < 1) {
@@ -89,7 +87,7 @@ function onPositionUpdate(emit, data) {
     // the race is over when all players finished
     if (all_finished === true) {
         globaldata.enabled = false;
-        emit('race_finished', globaldata.winner, globaldata.image);
+        emit('race_finished', globaldata.winner);
     }
 
 }
@@ -103,7 +101,7 @@ function onStartUpdate(emit) {
 }
 
 function onStop(emit) {
-    emit('race_finished', globaldata.winner, globaldata.image);
+    emit('race_finished', globaldata.winner);
     globaldata.enabled = false;
 }
 
@@ -157,7 +155,7 @@ router.all((req, res) => {
             console.log("A client disconnected.");
         });
 
-        socket.on('pos_update', (data) => onPositionUpdate(emit, data, image));
+        socket.on('pos_update', (data) => onPositionUpdate(emit, data));
         socket.on('start', () => onStartUpdate(emit));
         socket.on('stop', () => onStop(emit));
         socket.on('reset', () => onreset(emit));
