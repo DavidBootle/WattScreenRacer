@@ -1,12 +1,12 @@
 import Head from 'next/head';
 import Classes from './scoreboard.module.scss';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import io from 'socket.io-client';
 import useSocket from '../../src/useSocket';
 
 import { useStopwatch } from 'react-timer-hook';
 
-function ProgressBar({name, progress, color}) {
+function ProgressBar({name, progress, color, completed}) {
     return (
         <div className={Classes.progressBarContainer}>
             <div className={Classes.progressBarText}>{name}</div>
@@ -36,41 +36,52 @@ export default function Scoreboard(props) {
 
     useSocket(socket);
 
-    // manage sockets
-    socket.on('score_update', (data) => {
-        console.log('SCORE UPDATE');
-        window.data = data;
-        let newPlayers = {...players};
-        data.forEach((value) => {
-            if (players[value.id] === undefined) {
-                newPlayers[value.id] = value;
-            }
-            newPlayers[value.id].position = value.position;
+    useEffect(() => {
+        // manage sockets
+        socket.on('score_update', (data) => {
+            console.log('SCORE UPDATE');
+            window.data = data;
+            let newPlayers = {...players};
+            data.forEach((value) => {
+                if (players[value.id] === undefined) {
+                    newPlayers[value.id] = value;
+                }
+                newPlayers[value.id].position = value.position;
+            });
+            setPlayers(newPlayers);
         });
-        setPlayers(newPlayers);
-    });
 
-    socket.on('race_start', () => {
-        console.log('RACE STARTING');
-        setRaceState('RUNNING');
-        start();
-    });
+        socket.on('race_start', () => {
+            console.log('RACE STARTING');
+            setRaceState('RUNNING');
+            start();
+        });
 
-    socket.on('race_stop', () => {
-        setRaceState('FINISHED');
-        pause();
-    })
+        socket.on('race_stop', () => {
+            setRaceState('WAITING');
+            pause();
+        })
 
-    socket.on('race_reset', () => {
-        setRaceState('WAITING');
-        reset();
-    });
+        socket.on('race_finished', () => {
+            setRaceState('FINISHED');
+            pause();
+        })
 
-    socket.on('player_finish', (color) => {
-        if (!winner) {
-            setWinner(color);
-            setWinnerTime(`${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`);
-        }
+        socket.on('race_reset', () => {
+            setRaceState('WAITING');
+            pause();
+            reset();
+            setPlayers({});
+            setWinner(null);
+            setWinnerTime('');
+        });
+
+        socket.on('player_finish', (color) => {
+            if (!winner) {
+                setWinner(color);
+                setWinnerTime(`${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`);
+            }
+        });
     });
     
 
