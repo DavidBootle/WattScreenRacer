@@ -62,12 +62,12 @@ function onPositionUpdate(emit, data) {
         }
     })
 
-    if (previousdata !== null) {
+    /*if (previousdata !== null) {
         
         for (let i = 0; i < data.length; i++) {
             if (Math.abs(data[i].position)
         }
-    }
+    }*/
     // send to scoreboard
     emit('score_update', data);
     previousdata = data;
