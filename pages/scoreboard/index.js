@@ -1,6 +1,7 @@
 import Head from 'next/head';
 import Classes from './scoreboard.module.scss';
 import { useEffect, useState } from 'react';
+import io from 'socket.io-client';
 
 function ProgressBar({name, progress, color}) {
     return (
@@ -11,7 +12,6 @@ function ProgressBar({name, progress, color}) {
             </div>
         </div>
     )
-
 }
 
 export default function Scoreboard(props) {
@@ -19,6 +19,26 @@ export default function Scoreboard(props) {
     const [raceState, setRaceState] = useState('RUNNING');
     const [progressBars, setProgressBars] = useState([]);
     const [winner, setWinner] = useState(null);
+
+    useEffect(() => {
+        async function doShit() { 
+            // implement socket
+            await fetch('/api/socket');
+            const socket = io();
+
+            // print when connected
+            socket.on('connect', () => {
+                console.log('Sockets connected to server');
+            });
+
+            // print when disconnected
+            socket.on('disconnect', () => {
+                console.log('Disconnected from server');
+            });
+        }
+
+        doShit();
+    }, []);
 
     return (
         <div className={Classes.container}>

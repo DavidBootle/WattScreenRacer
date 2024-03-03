@@ -12,10 +12,18 @@ let globaldata = {
     players: {},
     count: 0,
     winner: null,
-} 
+}
 
 export default function handler(req, res) {
 
+    if (res.socket.server.io) {
+        console.log('Socket is already running');
+        res.end();
+        return;
+    }
+    console.log('Socket is initializing');
+
+    const io = new Server({ path: "/api/socket", addTrailingSlash: false, cors: { origin: "*" }});
     if (res.socket.server.io) {
         console.log('Socket is already running')
     } else {
@@ -23,7 +31,6 @@ export default function handler(req, res) {
         const io = new Server(res.socket.server)
         res.socket.server.io = io
     }
-    res.end()
 
     /**
      * Called when the position update is reported from the camera.
@@ -56,7 +63,7 @@ export default function handler(req, res) {
                 globaldata.players[value.color] = (globaldata.count)++;
                 id = globaldata.players[value.color];
             }
-            
+
             return {
                 ...value,
                 "id": id,
@@ -75,8 +82,8 @@ export default function handler(req, res) {
                 }
             }
             if (data[i].position < 1) {
-                all_finished = false;   
-            }            
+                all_finished = false;
+            }
         }
         // the race is over when all players finished
         if (all_finished === true) {
@@ -120,6 +127,8 @@ export default function handler(req, res) {
         socket.on('stop', () => onStop(socket));
         socket.on('reset', () => onreset(socket));
         socket.on('togglemanual', () => onToggle(socket))
-    })
+    });
+
+    res.end();
 }
 
