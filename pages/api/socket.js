@@ -13,8 +13,9 @@ let globaldata = {
     timerOn: false,
     players: {},
     count: 0,
-    winner: null,
+    winner: -1,
     ManualOnly: false,
+    previousdata: null,
 }
 
 const max_change = .2;
@@ -61,16 +62,21 @@ function onPositionUpdate(emit, data) {
         }
     })
 
-
+    if (previousdata !== null) {
+        
+        for (let i = 0; i < data.length; i++) {
+            if (Math.abs(data[i].position)
+        }
+    }
     // send to scoreboard
     emit('score_update', data);
-
+    previousdata = data;
     let all_finished = true;
     // when player has position 1, tell scoreboard that they finished
     for (let i = 0; i < data.length; i++) {
         if (data[i].position >= 1) {
             emit('player_finish', data[i].id);
-            if (globaldata.winner === null) {
+            if (globaldata.winner === -1) {
                 globaldata.winner = data[i].id;
             }
         }
@@ -94,10 +100,10 @@ function onStartUpdate(emit) {
     globaldata.enabled = true;
 }
 
-/*function onStop(emit) {
-    emit('race_stop');
+function onStop(emit) {
+    emit('race_stop', globaldata.winner);
     globaldata.enabled = false;
-}*/
+}
 
 function onreset(emit) {
     emit('race_reset')
@@ -105,6 +111,8 @@ function onreset(emit) {
     globaldata.enabled = true;
     globaldata.players = {};
     globaldata.count = 0;
+    globaldata.winner = -1;
+    globaldata.previousdata = null;
 }
 
 // if we use this
@@ -149,7 +157,7 @@ router.all((req, res) => {
 
         socket.on('pos_update', (data) => onPositionUpdate(emit, data));
         socket.on('start', () => onStartUpdate(emit));
-        //socket.on('stop', () => onStop(emit));
+        socket.on('stop', () => onStop(emit));
         socket.on('reset', () => onreset(emit));
         socket.on('togglemanual', () => onToggle(emit))
     });
