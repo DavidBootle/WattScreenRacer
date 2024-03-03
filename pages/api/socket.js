@@ -26,7 +26,7 @@ const max_change = .2;
  * @param {Socket} socket The websocket object from socket.io
  * @param {Data[]} data Incoming data from camera
  */
-function onPositionUpdate(emit, data) {
+function onPositionUpdate(emit, data, image) {
     // do nothing if not racing
     if (globaldata.enabled === false) {
         return;
@@ -91,7 +91,7 @@ function onPositionUpdate(emit, data) {
         // }
     }
     for (let i = 0; i < globaldata.players.length; i++) {
-        if (!globaldata.players[data[i].color].finishStatus) {
+        if (globaldata.players[data[i].color].finishStatus === undefined) {
             all_finished === false;
         }
     }
@@ -167,7 +167,7 @@ router.all((req, res) => {
             console.log("A client disconnected.");
         });
 
-        socket.on('pos_update', (data) => onPositionUpdate(emit, data));
+        socket.on('pos_update', (data, image) => onPositionUpdate(emit, data, image));
         socket.on('start', () => onStartUpdate(emit));
         socket.on('stop', () => onStop(emit));
         socket.on('reset', () => onreset(emit));
