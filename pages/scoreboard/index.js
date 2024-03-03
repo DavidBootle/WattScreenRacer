@@ -118,7 +118,7 @@ export default function Scoreboard(props) {
                     { raceState === 'RUNNING' && progressBars }
 
                     { raceState === 'FINISHED' &&
-                        <div className={Classes.winnerText}>{players[winner]?.name?.toUpperCase()} wins with a time of {winnerTime}!</div>
+                        <div className={Classes.winnerText} style={{color: players[winner]?.color}}>{players[winner]?.name?.toUpperCase()} wins with a time of {winnerTime}!</div>
                     }
                 </div>
             </div>
