@@ -129,8 +129,6 @@ router.all((req, res) => {
         console.log("A client connected");
         console.log(`A client connected. ID: ${clientId}`);
 
-        io.emit('connection_verification');
-
         // Event handler for receiving messages from the client
         socket.on("message", (data) => {
             console.log("Received message:", data);
