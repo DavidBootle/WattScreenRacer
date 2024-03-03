@@ -25,7 +25,6 @@ export default function Scoreboard(props) {
     const [players, setPlayers] = useState({});
     const [winner, setWinner] = useState(null);
     const [winnerTime, setWinnerTime] = useState('');
-    const [winImage, setWinImage] = useState(null);
 
     const {
         seconds,
@@ -66,7 +65,6 @@ export default function Scoreboard(props) {
         socket.on('race_finished', (id, image) => {
             setRaceState('FINISHED');
             setWinner(id);
-            setWinImage(image);
             pause();
         })
 
@@ -131,9 +129,6 @@ export default function Scoreboard(props) {
                     }
                     { raceState === 'FINISHED' && winner !== -1 &&
                         <div className={Classes.winnerText} style={{color: players[winner]?.color}}>{players[winner]?.name?.toUpperCase()} wins with a time of {winnerTime}!</div>
-                    }
-                    { raceState === 'FINISHED' && winImage !== null &&
-                        <img src={winImage} alt="Winner" className={Classes.winnerImage}/>
                     }
                 </div>
             </div>
