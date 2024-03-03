@@ -1,16 +1,15 @@
 import io from "socket.io-client"
 import styles from "./control.module.scss"
 import useSocket from '../../src/useSocket'
+import { useState } from "react";
 
 const socket = io();
 
 
-let ManualOnly = false;
-
 export default function control() {
     useSocket(socket);
 
-
+    const [ManualOnly, setManualOnly] = useState(false);
 
     return (
         <>
@@ -36,7 +35,7 @@ export default function control() {
             <div className={styles.container}>
                 <button className={styles.button} onClick={() => {
                     socket.emit('togglemanual')
-                    ManualOnly = !(ManualOnly);
+                    setManualOnly(!ManualOnly)
                 }}>Toggle Mode</button>
             </div>
         </>
