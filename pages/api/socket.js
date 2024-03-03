@@ -16,6 +16,8 @@ let globaldata = {
     winner: null,
 }
 
+
+
 /**
  * Called when the position update is reported from the camera.
  * @param {Socket} socket The websocket object from socket.io
@@ -27,7 +29,7 @@ function onPositionUpdate(emit, data) {
         return;
     }
     // start the race automatically if they start running.
-    if (globaldata.timerOn === false) {
+    /*if (globaldata.timerOn === false) {
         for (let i = 0; i < data.length; i++) {
             if (data[i].position > 0) {
                 emit('race_start');
@@ -35,10 +37,11 @@ function onPositionUpdate(emit, data) {
                 break;
             }
         }
+    
         // we might want this idk yet
         if (globaldata.timerOn === false)
             return;
-        
+    */        
     }
 
     // Javascript wizardry
