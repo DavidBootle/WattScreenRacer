@@ -51,7 +51,7 @@ let thedata4 = [{
     name: 'green',
 }]
 
-export default function control() {
+export default function Control() {
     useSocket(socket);
 
     const [ManualOnly, setManualOnly] = useState(false);

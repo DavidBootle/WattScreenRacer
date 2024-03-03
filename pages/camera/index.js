@@ -14,16 +14,18 @@ const videoConstraints = {
   facingMode: "user",
 };
 
-const WebcamCapture = ({ jerseyCalibrations, sendJerseyPositions }) => {
+const WebcamCapture = ({ jerseyCalibrations, sendJerseyPositions, lastUpdatedJerseyIndex }) => {
   useSocket(socket);
   const webcamRef = useRef(null);
-  const canvasRef = useRef(null);
+  const previewCanvasRef = useRef(null);
+  const thresholdHelperCanvasRef = useRef(null);
+
   const capturing = useRef(true);
   const captureTimeoutRef = useRef(null); // Ref to store the timeout ID
   const processingImage = useRef(false); // Ref to track image processing state
 
   const processImage = async (imageSrc) => {
-    if (!canvasRef.current || !imageSrc || processingImage.current) return;
+    if (!previewCanvasRef.current || !imageSrc || processingImage.current) return;
     processingImage.current = true; // Mark processing as started
 
     const image = new Image();
@@ -109,11 +111,16 @@ const WebcamCapture = ({ jerseyCalibrations, sendJerseyPositions }) => {
         cv.circle(input_image, center, 22, new cv.Scalar(0, 0, 0, 255), -1);
         cv.circle(input_image, center, 20, displayColorHsv, -1);
 
+        if(lastUpdatedJerseyIndex === jerseyCalibrations.indexOf(jersey)){
+        cv.imshow(thresholdHelperCanvasRef.current, frameMask);
+        }
+
         // 
         jersey_positions.push(
           {
+            name: jersey.name,
             color: jersey.displayColor,
-            position: cx / input_image.cols
+            position: cx / input_image.cols + 0.1
           }
         )
       }
@@ -128,7 +135,7 @@ const WebcamCapture = ({ jerseyCalibrations, sendJerseyPositions }) => {
     }
 
     // Ensure the canvas element is ready for display
-    cv.imshow(canvasRef.current, input_image);
+    cv.imshow(previewCanvasRef.current, input_image);
 
     // Cleanup to prevent memory leaks
     input_image.delete();
@@ -164,8 +171,10 @@ const WebcamCapture = ({ jerseyCalibrations, sendJerseyPositions }) => {
 
   return (
     <>
-    <div className="flex flex-row">
-      <div className="flex-1">
+    <div className="flex flex-row relative">
+
+      <canvas ref={previewCanvasRef} width="720" height="480"></canvas>
+      <canvas ref={thresholdHelperCanvasRef} width="720" height="480"></canvas>
       <Webcam
         audio={false}
         height={480}
@@ -174,11 +183,6 @@ const WebcamCapture = ({ jerseyCalibrations, sendJerseyPositions }) => {
         width={720}
         videoConstraints={videoConstraints}
       />
-      </div>
-      <div className="flex-1">
-      <canvas ref={canvasRef} width="720" height="480"></canvas>
-
-      </div>
     </div>
     </>
   );
@@ -323,7 +327,7 @@ const CameraPage = () => {
       },
     },
   ]);
-
+  const [lastUpdatedJerseyIndex, setLastUpdatedJerseyIndex] = useState(0);
   const [centerOfMass, setCenterOfMass] = useState({
     x: 0,
     y: 0,
@@ -384,6 +388,7 @@ const CameraPage = () => {
                   newJerseyData,
                   ...jerseyCalibrations.slice(index + 1),
                 ]);
+                setLastUpdatedJerseyIndex(index);
               }}
               deleteJersey={
                 jerseyCalibrations.length > 1
@@ -392,6 +397,9 @@ const CameraPage = () => {
                         ...jerseyCalibrations.slice(0, index),
                         ...jerseyCalibrations.slice(index + 1),
                       ]);
+                      if(index === lastUpdatedJerseyIndex){
+                        setLastUpdatedJerseyIndex(0);
+                      }
                     }
                   : undefined
               }
@@ -408,6 +416,7 @@ const CameraPage = () => {
             }
           }
         }
+        lastUpdatedJerseyIndex={lastUpdatedJerseyIndex}
       />
     </>
   );
