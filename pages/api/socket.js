@@ -16,7 +16,6 @@ let globaldata = {
     winner: -1,
     ManualOnly: false,
     previousdata: null,
-    winImage: null,
 }
 
 const max_change = .2;
@@ -76,30 +75,19 @@ function onPositionUpdate(emit, data) {
     // when player has position 1, tell scoreboard that they finished
     for (let i = 0; i < data.length; i++) {
         if (data[i].position >= 1) {
-            if (!globaldata.players[data[i].color].finishStatus) {
-                globaldata.players[data[i].color].finishStatus = true;
-                emit('player_finish', data[i].id);
-                if (globaldata.winner === -1) {
-                    globaldata.winner = data[i].id;
-                    globaldata.winImage = image;
-                }
+            emit('player_finish', data[i].id);
+            if (globaldata.winner === -1) {
+                globaldata.winner = data[i].id;
             }
         }
-
-        // if (data[i].position < 1) {
-        //     all_finished = false;
-        // }
-    }
-    for (let i = 0; i < globaldata.players.length; i++) {
-        if (!globaldata.players[data[i].color].finishStatus) {
-            all_finished === false;
+        if (data[i].position < 1) {
+            all_finished = false;
         }
     }
-
     // the race is over when all players finished
     if (all_finished === true) {
         globaldata.enabled = false;
-        emit('race_finished', globaldata.winner, globaldata.winImage);
+        emit('race_finished', globaldata.winner);
     }
 
 }
