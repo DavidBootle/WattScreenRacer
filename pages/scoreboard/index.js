@@ -11,7 +11,7 @@ function ProgressBar({name, progress, color, completed}) {
         <div className={Classes.progressBarContainer}>
             <div className={Classes.progressBarText}>{name}</div>
             <div className={Classes.progressBar}>
-                <div className={Classes.progressBarFill} style={{width: `${progress}%`, backgroundColor: color}}></div>
+                <div className={Classes.progressBarFill} style={{flexBasis: `${progress}%`, backgroundColor: color}}></div>
             </div>
         </div>
     )
@@ -25,6 +25,7 @@ export default function Scoreboard(props) {
     const [players, setPlayers] = useState({});
     const [winner, setWinner] = useState(null);
     const [winnerTime, setWinnerTime] = useState('');
+    const [narrowMode, setNarrowMode] = useState(true);
 
     const {
         seconds,
@@ -100,7 +101,7 @@ export default function Scoreboard(props) {
                 <div className={Classes.members}>David Bootle<br/>Uzayr Syed<br/>Kevin Cunningham<br/>Nathan Goller-Deitsch</div>
             </div>
             <div className={Classes.body}>
-                <div className={Classes.leftColumn}>
+                <div className={`${Classes.leftColumn} ${raceState === 'FINISHED' ? Classes.raceComplete: ''}`}>
                     { raceState === 'WAITING' &&
                         <div className={Classes.stateText}>WAITING TO START</div>
                     }
@@ -117,7 +118,10 @@ export default function Scoreboard(props) {
                     }
                     { raceState === 'RUNNING' && progressBars }
 
-                    { raceState === 'FINISHED' &&
+                    { raceState === 'FINISHED' && winner === -1 &&
+                        <div className={Classes.winnerText}>Nobody finished the race in time!</div>
+                    }
+                    { raceState === 'FINISHED' && winner !== -1 &&
                         <div className={Classes.winnerText} style={{color: players[winner]?.color}}>{players[winner]?.name?.toUpperCase()} wins with a time of {winnerTime}!</div>
                     }
                 </div>

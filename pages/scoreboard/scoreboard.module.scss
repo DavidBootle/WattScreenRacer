@@ -116,3 +116,66 @@
         }
     }
 }
+
+@media (max-height: 300px) {
+    .container {
+
+        .header {
+            display: none;
+        }
+
+        .body {
+            margin-top: 4px;
+            justify-content: center;
+            align-items: flex-start;
+            height: 100%;
+            gap: 0;
+            padding: 0;
+
+            flex-direction: row;
+            height: 100vh;
+            
+            .leftColumn {
+
+                &.raceComplete {
+                    display: none;
+                }
+
+                padding-top: 6px;
+                padding-left: 15px;
+
+                .stateText {
+                    font-size: 40px;
+                }
+
+                .stateTimer {
+                    font-size: 40px;
+                }
+            }
+            .rightColumn {
+                gap: 0;
+                margin: -5px;
+                height: 100vh;
+
+                .winnerText {
+                    font-size: 34px;
+                    margin-top: 14px;
+                }
+                
+                .paragraphText {
+                    display: none;
+                }
+
+                .progressBarContainer {
+                    height: 100%;
+
+                    .progressBarText {
+                        display: none;
+                    }
+                }
+            }
+
+            
+        }
+    }
+}
