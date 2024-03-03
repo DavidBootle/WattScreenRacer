@@ -29,6 +29,7 @@ export default function Scoreboard(props) {
         seconds,
         minutes,
         start,
+        pause,
         reset,
       } = useStopwatch({ autoStart: true });
 
@@ -51,6 +52,10 @@ export default function Scoreboard(props) {
         setRaceState('RUNNING');
         start();
     });
+
+    socket.on('race_stop', () => {
+        setRaceState('FINISHED');
+    })
 
     const progressBars = Object.values(players).map((player) => {
         console.log(player);
