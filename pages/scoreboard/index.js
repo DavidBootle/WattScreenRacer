@@ -1,5 +1,6 @@
 import Head from 'next/head';
 import Classes from './scoreboard.module.scss';
+import { useEffect, useState } from 'react';
 
 function ProgressBar({name, progress, color}) {
     return (
@@ -15,21 +16,29 @@ function ProgressBar({name, progress, color}) {
 
 export default function Scoreboard(props) {
 
+    const [raceState, setRaceState] = useState('WAITING');
+    const [progressBars, setProgressBars] = useState([]);
+
     return (
         <div className={Classes.container}>
             <div className={Classes.header}>
-                <div className={Classes.title}>Never Skip Cardio</div>
-                <div className={Classes.members}>David Bootle, Uzayr Syed, Kevin Cunningham, Nathan Goller-Deitsch</div>
+                <div className={Classes.title}>CU Run</div>
+                <div className={Classes.members}>David Bootle<br/>Uzayr Syed<br/>Kevin Cunningham<br/>Nathan Goller-Deitsch</div>
             </div>
             <div className={Classes.body}>
-                <div className={Classes.column}>
-                    <div className={Classes.stateText}>WAITING</div>
+                <div className={Classes.leftColumn}>
+                    { raceState === 'WAITING' &&
+                        <div className={Classes.stateText}>WAITING TO START</div>
+                    }
+                    { raceState === 'RUNNING' &&
+                        <div className={Classes.stateTimer}>0:13</div>
+                    }
+                    { raceState === 'FINISHED' &&
+                        <div className={Classes.stateText}>FINISHED</div>
+                    }
                 </div>
-                <div className={Classes.column}>
-                    <div className={Classes.progressBarContainer}>
-                        <ProgressBar name="P1" color="#f53b02" progress={72}/>
-                        <ProgressBar name="P2" color="#4cf5d6" progress={12}/>
-                    </div>
+                <div className={Classes.rightColumn}>
+                    { raceState === 'RUNNING' && progressBars }
                 </div>
             </div>
         </div>
