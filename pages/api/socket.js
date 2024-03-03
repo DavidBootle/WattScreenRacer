@@ -42,7 +42,7 @@ function onPositionUpdate(emit, data) {
         if (globaldata.timerOn === false)
             return;
     */        
-    }
+    //}
 
     // Javascript wizardry
     data = data.map((value, index, array) => {
