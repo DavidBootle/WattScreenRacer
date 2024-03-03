@@ -92,7 +92,7 @@ function onPositionUpdate(emit, data, image) {
     }
     for (let i = 0; i < globaldata.players.length; i++) {
         if (globaldata.players[data[i].color].finishStatus === undefined) {
-            all_finished === false;
+            all_finished = false;
         }
     }
 
