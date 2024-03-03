@@ -4,7 +4,13 @@ import useSocket from '../../src/useSocket'
 import { useState } from "react";
 
 const socket = io();
-
+let thedata = [{
+    position: 0.5,
+    color: 'red',
+},{
+    position: 0.1,
+    color: 'yellow',
+}]
 
 export default function control() {
     useSocket(socket);
@@ -37,6 +43,12 @@ export default function control() {
                     socket.emit('togglemanual')
                     setManualOnly(!ManualOnly)
                 }}>Toggle Mode</button>
+            </div>
+            <div className={styles.container}>
+                <button className={styles.button} onClick={() => {
+                    socket.emit('pos_update', thedata)
+                    setManualOnly(!ManualOnly)
+                }}>Datatest</button>
             </div>
         </>
     )

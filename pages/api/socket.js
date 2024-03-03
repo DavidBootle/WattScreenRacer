@@ -64,9 +64,9 @@ function onPositionUpdate(emit, data) {
     // when player has position 1, tell scoreboard that they finished
     for (let i = 0; i < data.length; i++) {
         if (data[i].position >= 1) {
-            emit('player_finish', data[i].id);
+            emit('player_finish', data[i].color);
             if (!globaldata.winner) {
-                globaldata.winner = data[i].id;
+                globaldata.winner = data[i].color;
             }
         }
         if (data[i].position < 1) {
