@@ -8,9 +8,11 @@ import parse from "color-parse";
 
 const socket = io();
 
-
-
-const WebcamCapture = ({ jerseyCalibrations, emitEvent, lastUpdatedJerseyIndex }) => {
+const WebcamCapture = ({
+  jerseyCalibrations,
+  emitEvent,
+  lastUpdatedJerseyIndex,
+}) => {
   useSocket(socket);
   const webcamRef = useRef(null);
   const previewCanvasRef = useRef(null);
@@ -21,7 +23,8 @@ const WebcamCapture = ({ jerseyCalibrations, emitEvent, lastUpdatedJerseyIndex }
   const processingImage = useRef(false); // Ref to track image processing state
 
   const processImage = async (imageSrc) => {
-    if (!previewCanvasRef.current || !imageSrc || processingImage.current) return;
+    if (!previewCanvasRef.current || !imageSrc || processingImage.current)
+      return;
     processingImage.current = true; // Mark processing as started
 
     const image = new Image();
@@ -32,23 +35,20 @@ const WebcamCapture = ({ jerseyCalibrations, emitEvent, lastUpdatedJerseyIndex }
     const hsv = new cv.Mat();
     cv.cvtColor(input_image, hsv, cv.COLOR_RGB2HSV, 0);
 
-
     // collect jersey positions
     let jersey_positions = [];
 
     // for each jersey calibration
     for (const jersey of jerseyCalibrations) {
-
       // convert jersey display color to hsv
-      const displayColor = parse(jersey.displayColor)
-      
+      const displayColor = parse(jersey.displayColor);
+
       const displayColorHsv = new cv.Scalar(
         displayColor.values[0],
         displayColor.values[1],
         displayColor.values[2],
         255
       );
-
 
       const frameMask = new cv.Mat();
       let low = new cv.Mat(hsv.rows, hsv.cols, hsv.type(), [
@@ -107,18 +107,20 @@ const WebcamCapture = ({ jerseyCalibrations, emitEvent, lastUpdatedJerseyIndex }
         cv.circle(input_image, center, 22, new cv.Scalar(0, 0, 0, 255), -1);
         cv.circle(input_image, center, 20, displayColorHsv, -1);
 
-        if(lastUpdatedJerseyIndex === jerseyCalibrations.indexOf(jersey)){
-        cv.imshow(thresholdHelperCanvasRef.current, frameMask);
+        if (lastUpdatedJerseyIndex === jerseyCalibrations.indexOf(jersey)) {
+          cv.imshow(thresholdHelperCanvasRef.current, frameMask);
         }
 
-        // 
-        jersey_positions.push(
-          {
-            name: jersey.name,
-            color: jersey.displayColor,
-            position: Math.max(0, Math.min(1, (cx / input_image.cols - 0.1) / 0.8))
-          }
-        )
+        //
+        jersey_positions.push({
+          name: jersey.name,
+          color: jersey.displayColor,
+          // position: Math.max(0, Math.min(1, (cx / input_image.cols - 0.1) / 0.8))
+          position: Math.max(
+            0,
+            Math.min(1, 1 - (cx / input_image.cols - 0.1) / 0.8)
+          ),
+        });
       }
 
       // cleanup
@@ -129,6 +131,22 @@ const WebcamCapture = ({ jerseyCalibrations, emitEvent, lastUpdatedJerseyIndex }
       contours.delete();
       hierarchy.delete();
     }
+
+    // show red dots at 10% and 90% of the screen for calibration
+    cv.circle(
+      input_image,
+      new cv.Point(input_image.cols * 0.1, input_image.rows / 2),
+      10,
+      new cv.Scalar(0, 0, 255, 255),
+      -1
+    );
+    cv.circle(
+      input_image,
+      new cv.Point(input_image.cols * 0.9, input_image.rows / 2),
+      10,
+      new cv.Scalar(0, 0, 255, 255),
+      -1
+    );
 
     // Ensure the canvas element is ready for display
     cv.imshow(previewCanvasRef.current, input_image);
@@ -167,22 +185,27 @@ const WebcamCapture = ({ jerseyCalibrations, emitEvent, lastUpdatedJerseyIndex }
 
   return (
     <>
-    <div className="flex flex-row relative">
+      <div className="flex flex-row relative">
+        <canvas ref={previewCanvasRef} width="360" height="240"></canvas>
+        <canvas
+          ref={thresholdHelperCanvasRef}
+          width="360"
+          height="240"
+        ></canvas>
 
-      <canvas ref={previewCanvasRef} width="720" height="480"></canvas>
-      <canvas ref={thresholdHelperCanvasRef} width="720" height="480"></canvas>
-
-      <Webcam
-        audio={false}
-        height={480}
-        ref={webcamRef}
-        screenshotFormat="image/jpeg"
-        width={720}
-        videoConstraints={{
-
-        }}
-      />
-    </div>
+        <Webcam
+          audio={false}
+          height={240}
+          ref={webcamRef}
+          screenshotFormat="image/jpeg"
+          width={360}
+          videoConstraints={{
+            facingMode: {
+              exact: "environment",
+            },
+          }}
+        />
+      </div>
     </>
   );
 };
@@ -302,7 +325,33 @@ const CameraPage = () => {
   // Jersey Defaults
   const [devices, setDevices] = useState([]);
 
-  const [jerseyCalibrations, setJerseyCalibrations] = useState([{"name":"New Yellow","displayColor":"#fefb41","hsvBounds":{"lowerHueBound":29,"upperHueBound":56,"lowerSaturationBound":74,"upperSaturationBound":255,"lowerValueBound":166,"upperValueBound":255}},{"name":"New Orange","displayColor":"#ff6a00","hsvBounds":{"lowerHueBound":0,"upperHueBound":16,"lowerSaturationBound":132,"upperSaturationBound":255,"lowerValueBound":162,"upperValueBound":255}},{"name":"New Red","displayColor":"#e22400","hsvBounds":{"lowerHueBound":164,"upperHueBound":180,"lowerSaturationBound":198,"upperSaturationBound":255,"lowerValueBound":105,"upperValueBound":255}}]);
+  const [jerseyCalibrations, setJerseyCalibrations] = useState([
+    {
+      name: "Yellow",
+      displayColor: "#fefb41",
+      hsvBounds: {
+        lowerHueBound: 29,
+        upperHueBound: 56,
+        lowerSaturationBound: 60,
+        upperSaturationBound: 255,
+        lowerValueBound: 165,
+        upperValueBound: 255,
+      },
+    },
+    {
+      name: "Red",
+      displayColor: "#e22400",
+      hsvBounds: {
+        lowerHueBound: 164,
+        upperHueBound: 180,
+        lowerSaturationBound: 190,
+        upperSaturationBound: 255,
+        lowerValueBound: 90,
+        upperValueBound: 255,
+      },
+    },
+  ]);
+  
   const [lastUpdatedJerseyIndex, setLastUpdatedJerseyIndex] = useState(0);
 
   return (
@@ -330,16 +379,26 @@ const CameraPage = () => {
         >
           Add Jersey
         </button>
-        <button className="bg-violet-400 text-white rounded p-2 m-2" onClick={() => {
-          // copy the jerseyCalibrations to clipboard
-          navigator.clipboard.writeText(JSON.stringify(jerseyCalibrations));
-        }}>Copy calibrations</button>
-        <button className="bg-violet-400 text-white rounded p-2 m-2" onClick={() => {
-          // paste the jerseyCalibrations from clipboard
-          navigator.clipboard.readText().then(text => {
-            setJerseyCalibrations(JSON.parse(text));
-          });
-        }}>Paste calibrations</button>
+        <button
+          className="bg-violet-400 text-white rounded p-2 m-2"
+          onClick={() => {
+            // copy the jerseyCalibrations to clipboard
+            navigator.clipboard.writeText(JSON.stringify(jerseyCalibrations));
+          }}
+        >
+          Copy calibrations
+        </button>
+        <button
+          className="bg-violet-400 text-white rounded p-2 m-2"
+          onClick={() => {
+            // paste the jerseyCalibrations from clipboard
+            navigator.clipboard.readText().then((text) => {
+              setJerseyCalibrations(JSON.parse(text));
+            });
+          }}
+        >
+          Paste calibrations
+        </button>
 
         <div className="flex flex-row gap-4 m-2">
           {jerseyCalibrations.map((jerseyData, index) => (
@@ -361,7 +420,7 @@ const CameraPage = () => {
                         ...jerseyCalibrations.slice(0, index),
                         ...jerseyCalibrations.slice(index + 1),
                       ]);
-                      if(index === lastUpdatedJerseyIndex){
+                      if (index === lastUpdatedJerseyIndex) {
                         setLastUpdatedJerseyIndex(0);
                       }
                     }
@@ -373,13 +432,11 @@ const CameraPage = () => {
       </div>
       <WebcamCapture
         jerseyCalibrations={jerseyCalibrations}
-        emitEvent={
-          (jersey_positions, image) => {
-            if(jersey_positions.length > 0){
-              socket.emit("pos_update", jersey_positions);
-            }
+        emitEvent={(jersey_positions, image) => {
+          if (jersey_positions.length > 0) {
+            socket.emit("pos_update", jersey_positions);
           }
-        }
+        }}
         lastUpdatedJerseyIndex={lastUpdatedJerseyIndex}
       />
     </>

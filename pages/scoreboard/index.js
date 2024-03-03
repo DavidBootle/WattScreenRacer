@@ -103,7 +103,7 @@ export default function Scoreboard(props) {
     return (
         <div className={Classes.container}>
             <div className={Classes.header}>
-                <div className={Classes.title}>CU Run</div>
+                <div className={Classes.title}>CU Run (live demo outside!)</div>
                 <div className={Classes.members}>David Bootle<br/>Uzayr Syed<br/>Kevin Cunningham<br/>Nathan Goller-Deitsch</div>
             </div>
             <div className={Classes.body}>
