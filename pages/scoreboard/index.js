@@ -11,7 +11,7 @@ function ProgressBar({name, progress, color, completed}) {
         <div className={Classes.progressBarContainer}>
             <div className={Classes.progressBarText}>{name}</div>
             <div className={Classes.progressBar}>
-                <div className={Classes.progressBarFill} style={{flexBasis: `${progress}%`, backgroundColor: color}}></div>
+                <div className={Classes.progressBarFill} style={{flexBasis: `${completed ? 100 : progress}%`, backgroundColor: color}}></div>
             </div>
         </div>
     )
@@ -25,7 +25,6 @@ export default function Scoreboard(props) {
     const [players, setPlayers] = useState({});
     const [winner, setWinner] = useState(null);
     const [winnerTime, setWinnerTime] = useState('');
-    const [narrowMode, setNarrowMode] = useState(true);
 
     const {
         seconds,
@@ -63,7 +62,7 @@ export default function Scoreboard(props) {
             pause();
         })
 
-        socket.on('race_finished', (id) => {
+        socket.on('race_finished', (id, image) => {
             setRaceState('FINISHED');
             setWinner(id);
             pause();
@@ -79,6 +78,13 @@ export default function Scoreboard(props) {
         });
 
         socket.on('player_finish', (id) => {
+            // update player data with finished stuff
+            let newPlayers = {...players};
+            if (newPlayers[id]) {
+                newPlayers[id].completed = true;
+                setPlayers(newPlayers);
+            }
+            
             if (!winner) {
                 setWinner(id);
                 setWinnerTime(`${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`);
@@ -90,7 +96,7 @@ export default function Scoreboard(props) {
     const progressBars = Object.values(players).map((player) => {
         console.log(player);
         return (
-            <ProgressBar key={player.id} name={player.name} progress={player.position * 100} color={player.color} />
+            <ProgressBar key={player.id} name={player.name} progress={player.position * 100} color={player.color} completed={player.completed ?? false}/>
         )
     });
 
