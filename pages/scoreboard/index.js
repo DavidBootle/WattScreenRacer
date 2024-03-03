@@ -1,7 +1,8 @@
 import Head from 'next/head';
 import Classes from './scoreboard.module.scss';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import io from 'socket.io-client';
+import useSocket from '../../src/useSocket';
 
 function ProgressBar({name, progress, color}) {
     return (
@@ -14,29 +15,37 @@ function ProgressBar({name, progress, color}) {
     )
 }
 
+const socket = io();
+
 export default function Scoreboard(props) {
 
     const [raceState, setRaceState] = useState('RUNNING');
     const [progressBars, setProgressBars] = useState([]);
     const [winner, setWinner] = useState(null);
 
-    useEffect(() => {
+    useSocket(socket);
 
-        fetch('/api/socket').then(() => {
-            // implement socket
-            const socket = io();
+    socket.on('connect', () => {
+        console.log('Sockets connected to server');
+    });
 
-            // print when connected
-            socket.on('connect', () => {
-                console.log('Sockets connected to server');
-            });
+    // print when disconnected
+    socket.on('disconnect', () => {
+        console.log('Disconnected from server');
+    });
 
-            // print when disconnected
-            socket.on('disconnect', () => {
-                console.log('Disconnected from server');
-            });
-        });
-    }, []);
+    socket.on('connection_verification', () => {
+        console.log('RECIEVED VERIFICATION FROM SERVER');
+    })
+
+    // look for incoming events
+    socket.on('score_update', (data) => {
+        console.log(data);
+    });
+
+    socket.on('race_start', () => {
+        setRaceState('RUNNING');
+    });
 
     return (
         <div className={Classes.container}>
