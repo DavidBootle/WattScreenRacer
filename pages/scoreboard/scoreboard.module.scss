@@ -7,4 +7,108 @@
 
     width: 100%;
     height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-direction: row;
+        width: 100%;
+
+        background-color: white;
+        color: black;
+
+        padding: 40px;
+
+        .title {
+            font-size: 4rem;
+            font-weight: bold;
+        }
+    }
+
+    .body {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+
+        padding: 40px;
+
+        height: 100%;
+        gap: 40px;
+
+        .leftColumn {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+
+            flex-basis: 30%;
+
+            .stateText {
+                font-size: 5rem;
+            }
+
+            .stateTimer {
+                font-size: 7rem;
+            }
+        }
+
+        .rightColumn {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+
+            flex-basis: 70%;
+            height: 100%;
+
+            .paragraphText {
+                font-size: 2rem;
+                font-style: italic;
+            }
+
+            .progressBarContainer {
+                width: 100%;
+                height: 100%;
+                max-height: 100px;
+                
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                align-items: center;
+
+                gap: 24px;
+                
+                .progressBarText {
+                    font-size: 2rem;
+                    font-weight: bold;
+                    flex-basis: 160px;
+                    display: inline-flex;
+                    justify-content: flex-end;
+                    align-items: center;
+                }
+
+                .progressBar {
+                    width: 100%;
+                    height: 100%;
+
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: flex-start;
+
+                    .progress {
+                        width: 0%;
+                        height: 100%;
+                        background-color: black;
+                        transition: width 0.5s;
+                    }
+                }
+            }
+        }
+    }
 }
