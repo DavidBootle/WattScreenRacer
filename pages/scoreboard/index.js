@@ -19,7 +19,7 @@ const socket = io();
 
 export default function Scoreboard(props) {
 
-    const [raceState, setRaceState] = useState('RUNNING');
+    const [raceState, setRaceState] = useState('WAITING');
     const [progressBars, setProgressBars] = useState([]);
     const [winner, setWinner] = useState(null);
 
