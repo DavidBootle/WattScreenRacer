@@ -16,7 +16,7 @@ let globaldata = {
     winner: null,
 }
 
-
+const max_change = .2;
 
 /**
  * Called when the position update is reported from the camera.
@@ -57,6 +57,8 @@ function onPositionUpdate(emit, data) {
             "id": id,
         }
     })
+
+
     // send to scoreboard
     emit('score_update', data);
 
@@ -89,10 +91,10 @@ function onStartUpdate(emit) {
     globaldata.enabled = true;
 }
 
-function onStop(emit) {
+/*function onStop(emit) {
     emit('race_stop');
     globaldata.enabled = false;
-}
+}*/
 
 function onreset(emit) {
     emit('race_reset')
@@ -144,7 +146,7 @@ router.all((req, res) => {
 
         socket.on('pos_update', (data) => onPositionUpdate(emit, data));
         socket.on('start', () => onStartUpdate(emit));
-        socket.on('stop', () => onStop(emit));
+        //socket.on('stop', () => onStop(emit));
         socket.on('reset', () => onreset(emit));
         socket.on('togglemanual', () => onToggle(emit))
     });
