@@ -70,7 +70,7 @@ function onPositionUpdate(emit, data) {
     for (let i = 0; i < data.length; i++) {
         if (data[i].position >= 1) {
             emit('player_finish', data[i].id);
-            if (!globaldata.winner) {
+            if (globaldata.winner === null) {
                 globaldata.winner = data[i].id;
             }
         }
