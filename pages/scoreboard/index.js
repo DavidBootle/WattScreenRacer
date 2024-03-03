@@ -16,7 +16,7 @@ function ProgressBar({name, progress, color}) {
 
 export default function Scoreboard(props) {
 
-    const [raceState, setRaceState] = useState('WAITING');
+    const [raceState, setRaceState] = useState('RUNNING');
     const [progressBars, setProgressBars] = useState([]);
 
     return (
@@ -38,7 +38,11 @@ export default function Scoreboard(props) {
                     }
                 </div>
                 <div className={Classes.rightColumn}>
+                    { raceState === 'WAITING' &&
+                        <div className={Classes.paragraphText}>Hey there, CUHackit! Stick around! We'll be starting again soon!</div>
+                    }
                     { raceState === 'RUNNING' && progressBars }
+                    
                 </div>
             </div>
         </div>
