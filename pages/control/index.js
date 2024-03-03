@@ -7,38 +7,48 @@ const socket = io();
 let thedata = [{
     position: 0.5,
     color: 'red',
+    name: 'red',
 },{
     position: 0.1,
     color: 'yellow',
+    name: 'yellow',
 }]
 let thedata2 = [{
     position: 0.7,
     color: 'red',
+    name: 'red',
 },{
     position: 0.4,
     color: 'green',
+    name: 'green',
 }]
 
 let thedata3 = [{
     position: 1,
     color: 'red',
+    name: 'red',
 },{
     position: 0.6,
     color: 'yellow',
+    name: 'yellow',
 },{
     position: 0.8,
     color: 'green',
+    name: 'green',
 }]
 
 let thedata4 = [{
     position: 1,
     color: 'red',
+    name: 'red',
 },{
     position: 1,
     color: 'yellow',
+    name: 'yellow',
 },{
     position: 1,
     color: 'green',
+    name: 'green',
 }]
 
 export default function control() {
