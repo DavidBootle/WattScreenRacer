@@ -14,6 +14,7 @@ let globaldata = {
     players: {},
     count: 0,
     winner: null,
+    ManualOnly: false,
 }
 
 const max_change = .2;
@@ -28,21 +29,23 @@ function onPositionUpdate(emit, data) {
     if (globaldata.enabled === false) {
         return;
     }
+    if (globaldata.ManualOnly === false) {
     // start the race automatically if they start running.
-    if (globaldata.timerOn === false) {
-        for (let i = 0; i < data.length; i++) {
-            if (data[i].position > 0) {
-                emit('race_start');
-                globaldata.timerOn = true;
-                break;
+        if (globaldata.timerOn === false) {
+            for (let i = 0; i < data.length; i++) {
+                if (data[i].position > 0) {
+                    emit('race_start');
+                    globaldata.timerOn = true;
+                    break;
+                }
             }
         }
-    
+    }
         // we might want this idk yet
         if (globaldata.timerOn === false)
             return;
            
-    }
+    
 
     // Javascript wizardry
     data = data.map((value, index, array) => {
