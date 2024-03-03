@@ -101,7 +101,7 @@ function onStartUpdate(emit) {
 }
 
 function onStop(emit) {
-    emit('race_stop', globaldata.winner);
+    emit('race_finished', globaldata.winner);
     globaldata.enabled = false;
 }
 
